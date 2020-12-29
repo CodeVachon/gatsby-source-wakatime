@@ -4,6 +4,10 @@ A Gatsby Source to import your data from the [WakaTime](https://wakatime.com) AP
 
 This source requires your WakaTime API Key which can be found in your [account settings](https://wakatime.com/settings/account).
 
+> **NOTE**
+>
+> If you are on the **FREE** tier on Wakatime, you are limited to a maxium of 14 days of data.
+
 ## Getting Started
 
 1. Install the package with **yarn** or **npm**
@@ -18,9 +22,7 @@ module.exports = {
         {
             resolve: "gatsby-source-wakatime",
             options: {
-                baseURL: "https://wakatime.com/api/v1",
-                apiKey: "",
-                timespan: "7day"
+                apiKey: ""
             }
         }
     ]
@@ -37,8 +39,7 @@ module.exports = {
             options: {
                 baseURL: "https://wakatime.com/api/v1",
                 apiKey: "",
-                timespan: "7day" // 30day
-            }
+                timespan: "7day" // any timespan acceptable by the `ms` module
         }
     ]
 };

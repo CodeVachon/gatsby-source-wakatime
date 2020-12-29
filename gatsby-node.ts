@@ -4,6 +4,7 @@ import fetch from "isomorphic-fetch";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
+import ms from "ms";
 
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
@@ -65,6 +66,8 @@ interface IWakaTimeDaySummaryRecord {
     };
 }
 interface IWakaTimeSummaryResponse {
+    error?: string;
+    show_upgrade_modal?: boolean;
     data: IWakaTimeDaySummaryRecord[];
     end: string;
     start: string;
@@ -108,14 +111,15 @@ const sourceNodes: IGatsbyNodeSourceNodes = async (
         "base64"
     )}`;
 
-    const [duration, interval] = options.timespan
-        .replace(new RegExp("^([\\d{1,}])"), "$1 ")
-        .split(new RegExp("\\s{1,}"));
-
+    const dateDuration = dayjs.duration(ms(options.timespan));
     const startDate = dayjs()
-        .subtract(Number(duration), interval as "day")
+        .subtract(dateDuration.asDays(), "day")
         .format(SUMMARY_DATE_FORMAT);
     const endDate = dayjs().format(SUMMARY_DATE_FORMAT);
+
+    console.info(
+        `Getting Information from WakaTime from ${startDate} to ${endDate}`
+    );
 
     const summaries: IWakaTimeSummaryResponse = await fetch(
         options.baseURL +
@@ -127,7 +131,9 @@ const sourceNodes: IGatsbyNodeSourceNodes = async (
         }
     ).then((response) => response.json());
 
-    // console.log(summaries);
+    if (summaries.error) {
+        throw new Error(summaries.error);
+    }
 
     interface IWakaTimeSummarySum {
         [key: string]: {
