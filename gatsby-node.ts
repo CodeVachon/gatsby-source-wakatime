@@ -140,6 +140,8 @@ const sourceNodes: IGatsbyNodeSourceNodes = async (
         [key: string]: IWakaTimeSummarySum;
     } = {};
 
+    const thisTypeBase = `WAKA_TIME_SUMMARY`;
+
     summaries.data.forEach((summary) => {
         const summaryKeys: (keyof typeof summary)[] = Object.keys(
             summary
@@ -168,6 +170,21 @@ const sourceNodes: IGatsbyNodeSourceNodes = async (
                     record.total_seconds;
             });
         });
+
+        createNode({
+            ...summary,
+            id: createNodeId(
+                `${thisTypeBase}-${dayjs(summary.range.start).format(
+                    SUMMARY_DATE_FORMAT
+                )}`
+            ),
+            parent: null,
+            children: [],
+            internal: {
+                type: thisTypeBase,
+                contentDigest: createContentDigest(summary)
+            }
+        });
     });
 
     Object.entries(compoundSummaries).forEach(([objKey, typeEntries]) => {
@@ -193,7 +210,7 @@ const sourceNodes: IGatsbyNodeSourceNodes = async (
                 text: duration.humanize()
             };
 
-            const thisType = `WAKA_TIME_${String(key).toUpperCase()}`;
+            const thisType = `${thisTypeBase}_${String(key).toUpperCase()}`;
 
             createNode({
                 ...record,
