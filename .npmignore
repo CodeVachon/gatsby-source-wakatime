@@ -1,0 +1,6 @@
+.github
+.vscode
+.gitignore
+.nvmrc
+prettier.config.js
+tsconfig.json
